@@ -1,39 +1,32 @@
 const express = require("express");
-const { adminAuth, userAuth } = require("./middlewares/auth");
+const connectDatabase = require("./config/database");
+const User = require("./models/user");
 const app = express();
 const port = 4444;
 
-/* app.get("/user", (req, res) => {
-  res.send({ firstName: "Sashank", lastName: "AB" });
-}); */
-
-/* app.get("/user/:userId/:name", (req, res) => {
-  console.log(req.params);
-  res.send({ firstName: "Samuel", lastName: "John" });
-}); */
-
-/* app.post("/user", (req, res) => {
-  res.send("Data is saved successfully!");
-});
-app.delete("/user", (req, res) => {
-  res.send("Data is deleted successfully!");
-});
-app.use((req, res) => {
-  res.send("Hi from the server!");
-}); */
-
-//app.use('/first', [rh, rh1, rh2],[ rh3,rh4],rh5) --> wrapping route handlers in arrays- works fine
-
-app.use("/admin", adminAuth);
-
-app.post("/user/login", userAuth, (req, res) => {
-  res.send("User logged in successfully!");
+app.post("/signup", async (req, res) => {
+  const user = new User({
+    firstName: "Sashank",
+    lastName: "Akkabattula",
+    age: 25,
+    emailId: "sashank@dev.com",
+    nationality: "Indian",
+  });
+  try {
+    await user.save();
+    res.send("User Signed up successfully!");
+  } catch (err) {
+    res.status(400).send("Error signing up the user:" + err.message);
+  }
 });
 
-app.get("/admin/getAllData", (req, res) => {
-  res.send("Here is your data!");
-});
-
-app.listen(port, () => {
-  console.log("Server connected and listening on port..", port);
-});
+connectDatabase()
+  .then(() => {
+    console.log("DATABASE CONNECTION ESTABLISHED!");
+    app.listen(port, () => {
+      console.log("Server connected and listening on port:", port);
+    });
+  })
+  .catch((err) => {
+    console.error("Database cannot be connected!");
+  });
