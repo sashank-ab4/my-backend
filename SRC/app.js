@@ -3,15 +3,24 @@ const connectDatabase = require("./config/database");
 const User = require("./models/user");
 const app = express();
 const port = 4444;
+app.use(express.json());
 
 app.post("/signup", async (req, res) => {
-  const user = new User({
+  const user = new User(req.body);
+
+  // creating a new instance of user model
+  /*const user = new User({
     firstName: "Sashank",
     lastName: "Akkabattula",
     age: 25,
     emailId: "sashank@dev.com",
-    nationality: "Indian",
-  });
+    nationality: "Indian", 
+  }); 
+  
+  // this way's the sending data hardcoded!
+  app.use(express.json()); and req.body helps sending data dynamically!
+  */
+
   try {
     await user.save();
     res.send("User Signed up successfully!");
