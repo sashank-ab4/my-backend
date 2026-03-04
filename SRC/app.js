@@ -1,4 +1,5 @@
 const express = require("express");
+const { adminAuth, userAuth } = require("./middlewares/auth");
 const app = express();
 const port = 4444;
 
@@ -23,17 +24,15 @@ app.use((req, res) => {
 
 //app.use('/first', [rh, rh1, rh2],[ rh3,rh4],rh5) --> wrapping route handlers in arrays- works fine
 
-app.use("/first", [
-  (req, res, next) => {
-    console.log("first rH");
-    next();
-    res.send("Response:1");
-  },
-  (req, res) => {
-    console.log("second rH");
-    res.send("Response:2");
-  },
-]);
+app.use("/admin", adminAuth);
+
+app.post("/user/login", userAuth, (req, res) => {
+  res.send("User logged in successfully!");
+});
+
+app.get("/admin/getAllData", (req, res) => {
+  res.send("Here is your data!");
+});
 
 app.listen(port, () => {
   console.log("Server connected and listening on port..", port);
