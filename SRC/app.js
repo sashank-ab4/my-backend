@@ -6,10 +6,10 @@ const port = 4444;
   res.send({ firstName: "Sashank", lastName: "AB" });
 }); */
 
-app.get("/user/:userId/:peru", (req, res) => {
+/* app.get("/user/:userId/:name", (req, res) => {
   console.log(req.params);
   res.send({ firstName: "Samuel", lastName: "John" });
-});
+}); */
 
 /* app.post("/user", (req, res) => {
   res.send("Data is saved successfully!");
@@ -20,6 +20,20 @@ app.delete("/user", (req, res) => {
 app.use((req, res) => {
   res.send("Hi from the server!");
 }); */
+
+//app.use('/first', [rh, rh1, rh2],[ rh3,rh4],rh5) --> wrapping route handlers in arrays- works fine
+
+app.use("/first", [
+  (req, res, next) => {
+    console.log("first rH");
+    next();
+    res.send("Response:1");
+  },
+  (req, res) => {
+    console.log("second rH");
+    res.send("Response:2");
+  },
+]);
 
 app.listen(port, () => {
   console.log("Server connected and listening on port..", port);
