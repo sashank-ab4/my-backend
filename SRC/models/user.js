@@ -1,28 +1,63 @@
+// this is schema!
+
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
-  firstName: {
-    type: String,
+const userSchema = new mongoose.Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
+      type: String,
+    },
+    emailId: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    phoneNumber: {
+      type: Number,
+      required: true,
+    },
+    age: {
+      type: Number,
+    },
+    gender: {
+      type: String,
+      validate(value) {
+        if (!["Male", "Female", "Others"].includes(value)) {
+          throw new Error("Invalid Gender!");
+        }
+      },
+    },
+    nationality: {
+      type: String,
+    },
+    about: {
+      type: String,
+      default: "Default About ",
+    },
+    photoUrl: {
+      type: String,
+      default:
+        "https://in.pinterest.com/pin/default-avatar-profile-user-profile-icon-profile-picture-portrait-symbol-user-member--674695587964911257/",
+    },
+    nationality: {
+      type: String,
+    },
+    skills: {
+      type: [String],
+    },
   },
-  lastName: {
-    type: String,
-  },
-  emailId: {
-    type: String,
-  },
-  phoneNumber: {
-    type: Number,
-  },
-  age: {
-    type: Number,
-  },
-  gender: {
-    type: String,
-  },
-  nationality: {
-    type: String,
-  },
-});
+  { timestamps: true },
+);
 
 const User = mongoose.model("User", userSchema);
 

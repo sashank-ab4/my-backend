@@ -39,7 +39,7 @@ app.get("/user", async (req, res) => {
       res.send(users);
     }
   } catch (err) {
-    res.send(404).send("Something went wrong:");
+    res.send(404).send("Something went wrong:" + err.message);
   }
 });
 // get all USERS
@@ -48,7 +48,7 @@ app.get("/users", async (req, res) => {
     const allUsers = await User.find({});
     res.send(allUsers);
   } catch (err) {
-    res.send(404).send("Something went wrong!");
+    res.send(404).send("Something went wrong!" + err.message);
   }
 });
 
@@ -60,8 +60,9 @@ app.delete("/users", async (req, res) => {
     const user = await User.findByIdAndDelete({ _id: userId });
     /* const user = await User.findByIdAndDelete( userId ); --> shorthand for above code and is acceptible accd to mongoose documentation*/
     res.send("deleted user!");
+    console.log(user);
   } catch (err) {
-    res.send(404).send("Something went wrong!");
+    res.send(404).send("Something went wrong!" + err.message);
   }
 });
 
@@ -71,11 +72,13 @@ app.patch("/users", async (req, res) => {
   const userId = req.body.userId;
   const data = req.body;
   try {
-    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, data);
+    const updatedUser = await User.findByIdAndUpdate({ _id: userId }, data, {
+      runValidators: true,
+    });
     res.send("User is updated successfully!");
     console.log(updatedUser);
   } catch (err) {
-    res.send(404).send("Something went wrong!");
+    res.send(404).send("Something went wrong!" + err.message);
   }
 });
 
