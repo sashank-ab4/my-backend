@@ -1,6 +1,7 @@
 // this is schema!
 
 const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema(
   {
@@ -17,10 +18,22 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Email structure is invalid" + value);
+        }
+      },
     },
     password: {
       type: String,
       required: true,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error(
+            "Password is not matching the strong criteria:" + value,
+          );
+        }
+      },
     },
     phoneNumber: {
       type: Number,
@@ -48,6 +61,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default:
         "https://in.pinterest.com/pin/default-avatar-profile-user-profile-icon-profile-picture-portrait-symbol-user-member--674695587964911257/",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL type:" + value);
+        }
+      },
     },
     nationality: {
       type: String,
