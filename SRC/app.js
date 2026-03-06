@@ -10,6 +10,7 @@ const cookieParser = require("cookie-parser");
 app.use(express.json());
 app.use(cookieParser());
 const { validateSignUpData } = require("./utils/validation");
+const { userAuth } = require("./middlewares/auth");
 
 // sign up API
 app.post("/signup", async (req, res) => {
@@ -19,7 +20,7 @@ app.post("/signup", async (req, res) => {
     validateSignUpData(req);
     // Encryption of data (the password)
     const encryptPassword = await bcrypt.hash(password, 10);
-    console.log(encryptPassword);
+
     // creating a new user model: easy and best modern way!
     const user = new User({
       firstName,
@@ -60,11 +61,14 @@ app.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (isPasswordValid) {
       // Creating a JWT token for the user
-      const token = await jwt.sign({ _id: user._id }, "YekTerSec$44");
-      console.log(token);
+      const token = jwt.sign({ _id: user._id }, "YekTerSec$44", {
+        expiresIn: "1d",
+      });
 
       // Adding the token to cookie and send the (required) response back to the user
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 7 * 3600000),
+      });
       res.send("Logged in Successfully");
     } else {
       throw new Error("Invalid Credentials!");
@@ -76,27 +80,21 @@ app.post("/login", async (req, res) => {
 
 // get /profile API
 
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
+  // this /profile API is secured and accessible omly after successfull LOGIN with valid credentials unless token is valid
   // now i want to validate my cookie (happens at server side)
-  const cookies = req.cookies;
-
-  const { token } = cookies;
-  if (!token) {
-    return res.status(401).send("Token not found in cookies!");
-  }
-  //validate my token
+  // validate my token
   try {
-    const decodedMessage = await jwt.verify(token, "YekTerSec$44");
-    const { _id } = decodedMessage;
-    console.log("logged user's id is:" + _id);
-    const user = await User.findById(_id);
-    if (!user) {
-      return res.status(401).send("User not found!");
-    }
+    const user = req.user;
     res.send(user);
   } catch (err) {
-    res.status(401).send("Invalid Token!");
+    res.status(401).send("Invalid Token!" + err.message);
   }
+});
+// API for posting something but need authentication to access this tab/api
+app.post("/postOnSocials", userAuth, async (req, res) => {
+  const user = req.user;
+  res.send(user.firstName + "wants to post on social media");
 });
 
 // get USER by EMAIL
@@ -167,7 +165,7 @@ connectDatabase()
   .then(() => {
     console.log("DATABASE CONNECTION ESTABLISHED!");
     app.listen(port, () => {
-      console.log("Server connected and listening on port:", port);
+      console.log("Server connected and listening to port:", port);
     });
   })
   .catch((err) => {
