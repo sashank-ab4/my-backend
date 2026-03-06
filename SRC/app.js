@@ -3,13 +3,34 @@ const connectDatabase = require("./config/database");
 const User = require("./models/user");
 const app = express();
 const port = 4444;
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+
 app.use(express.json());
+app.use(cookieParser());
+const { validateSignUpData } = require("./utils/validation");
 
+// sign up API
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body); // post req- creating database
+  const { firstName, lastName, emailId, password, phoneNumber } = req.body;
+  try {
+    // validation of data
+    validateSignUpData(req);
+    // Encryption of data (the password)
+    const encryptPassword = await bcrypt.hash(password, 10);
+    console.log(encryptPassword);
+    // creating a new user model: easy and best modern way!
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: encryptPassword,
+      phoneNumber,
+    }); // post req- creating database
 
-  // creating a new instance of user model
-  /*const user = new User({
+    // creating a new instance of user model
+    /*const user = new User({
     firstName: "Sashank",
     lastName: "Akkabattula",
     age: 25,
@@ -21,13 +42,63 @@ app.post("/signup", async (req, res) => {
   app.use(express.json()); and req.body helps sending data dynamically!
   */
 
-  try {
     await user.save();
     res.send("User Signed up successfully!");
   } catch (err) {
     res.status(400).send("Error signing up the user:" + err.message);
   }
 });
+
+// login API
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid Credentials!");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (isPasswordValid) {
+      // Creating a JWT token for the user
+      const token = await jwt.sign({ _id: user._id }, "YekTerSec$44");
+      console.log(token);
+
+      // Adding the token to cookie and send the (required) response back to the user
+      res.cookie("token", token);
+      res.send("Logged in Successfully");
+    } else {
+      throw new Error("Invalid Credentials!");
+    }
+  } catch (error) {
+    res.status(400).send("ERROR:" + error.message);
+  }
+});
+
+// get /profile API
+
+app.get("/profile", async (req, res) => {
+  // now i want to validate my cookie (happens at server side)
+  const cookies = req.cookies;
+
+  const { token } = cookies;
+  if (!token) {
+    return res.status(401).send("Token not found in cookies!");
+  }
+  //validate my token
+  try {
+    const decodedMessage = await jwt.verify(token, "YekTerSec$44");
+    const { _id } = decodedMessage;
+    console.log("logged user's id is:" + _id);
+    const user = await User.findById(_id);
+    if (!user) {
+      return res.status(401).send("User not found!");
+    }
+    res.send(user);
+  } catch (err) {
+    res.status(401).send("Invalid Token!");
+  }
+});
+
 // get USER by EMAIL
 app.get("/user", async (req, res) => {
   const userEmail = req.body.emailId;
