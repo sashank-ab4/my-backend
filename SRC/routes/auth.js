@@ -7,7 +7,7 @@ const authRouter = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-// sign up API
+// signUp API
 authRouter.post("/signup", async (req, res) => {
   const { firstName, lastName, emailId, password, phoneNumber } = req.body;
   try {
@@ -44,6 +44,7 @@ authRouter.post("/signup", async (req, res) => {
     res.status(400).send("Error signing up the user:" + err.message);
   }
 });
+// login API
 authRouter.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
@@ -70,5 +71,11 @@ authRouter.post("/login", async (req, res) => {
     res.status(400).send("ERROR:" + error.message);
   }
 });
+// logout API
 
+authRouter.post("/logout", async (req, res) => {
+  res
+    .cookie("token", null, { expires: new Date(Date.now()) })
+    .send("User Logged out Successfully!");
+});
 module.exports = authRouter;
