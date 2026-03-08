@@ -1,4 +1,4 @@
-// this is schema!
+// this is "User" schema!
 
 const mongoose = require("mongoose");
 const validator = require("validator");
@@ -76,7 +76,8 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
+// indexing
+userSchema.index({ firstName: 1, lastName: 1 });
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
