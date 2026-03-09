@@ -14,8 +14,8 @@ requestRouter.post(
       const senderUserId = req.user._id;
       const receiverUserId = req.params.receiverUserId;
       const status = req.params.status;
-      // logics for
-      // only two statuses are allowed and if one manually enters any others like -accepted, rejected - throw's error!
+      // logics for:
+      // only two statuses are allowed and if one manually enters others statuses like-accepted/rejected - throw's error!
       const onlyAllowedStatus = ["interested", "ignored"];
       if (!onlyAllowedStatus.includes(status)) {
         return res
@@ -62,6 +62,44 @@ requestRouter.post(
           toUser.firstName,
         data,
       });
+    } catch (err) {
+      res.status(401).send("ERROR:" + err.message);
+    }
+  },
+);
+
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user;
+      const { status, requestId } = req.params;
+
+      /* KEY CHECKS */
+      // validate the status
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid Status type:" + status });
+      }
+      // Sam John ==> Aegon
+      // status = only if interested
+      // requestId should be valid : (meaning should be in DB)
+      const connectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        receiverUserId: loggedInUser._id,
+        status: "interested",
+      });
+      if (!connectionRequest) {
+        return res
+          .status(404)
+          .json({ message: "Connection request is not valid" });
+      }
+      connectionRequest.status = status;
+      const data = await connectionRequest.save();
+      res.json({ message: "Your connection is " + status, data });
     } catch (err) {
       res.status(401).send("ERROR:" + err.message);
     }
