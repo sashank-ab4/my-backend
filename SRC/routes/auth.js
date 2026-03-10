@@ -9,7 +9,8 @@ const jwt = require("jsonwebtoken");
 
 // signUp API
 authRouter.post("/signup", async (req, res) => {
-  const { firstName, lastName, emailId, password, phoneNumber } = req.body;
+  const { firstName, lastName, emailId, password, phoneNumber, age, gender } =
+    req.body;
   try {
     // validation of data
     validateSignUpData(req);
@@ -23,6 +24,8 @@ authRouter.post("/signup", async (req, res) => {
       emailId,
       password: encryptPassword,
       phoneNumber,
+      age,
+      gender,
     }); // post req- creating database
 
     // creating a new instance of user model
