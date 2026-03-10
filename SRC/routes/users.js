@@ -13,14 +13,7 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
     const connectionRequests = await ConnectionRequestModel.find({
       receiverUserId: loggedInUser._id,
       status: "interested",
-    }).populate("senderUserId", [
-      "firstName, lastName",
-      "age",
-      "gender",
-      "about",
-      "skills",
-      "photoUrl",
-    ]);
+    }).populate("senderUserId", VISBILE_DATA);
     res.json({
       message: "Data fetched successfully",
       data: connectionRequests,
@@ -63,6 +56,12 @@ userRouter.get("/feed", userAuth, async (req, res) => {
     // 3. loggedIn user's ignored cards
     // 4. loggedIn user's accepted connections
     const loggedInUser = req.user;
+    // pagination logic
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    //data sanitization preventing users asking limit more than anything
+    limit = limit > 50 ? 50 : limit;
+    const skip = (page - 1) * limit;
     // find all the connection requests (sent and received)
     const connectionRequests = await ConnectionRequestModel.find({
       $or: [
@@ -82,7 +81,10 @@ userRouter.get("/feed", userAuth, async (req, res) => {
         { _id: { $nin: Array.from(usersShouldNotBeInFeed) } },
         { _id: { $ne: loggedInUser._id } },
       ],
-    }).select(VISBILE_DATA);
+    })
+      .select(VISBILE_DATA)
+      .skip(skip)
+      .limit(limit);
 
     res.json({
       message: "Core Feed",
