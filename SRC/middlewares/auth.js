@@ -7,7 +7,7 @@ const userAuth = async (req, res, next) => {
     const cookies = req.cookies;
     const { token } = cookies;
     if (!token) {
-      return res.status(401).send("Token not found in cookies!");
+      return res.status(401).send("You are logged out, please log in!");
     }
     const decodedObject = jwt.verify(token, "YekTerSec$44");
 

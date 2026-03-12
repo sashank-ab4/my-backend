@@ -23,18 +23,22 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
       throw new Error("Editing this field is not allowed!");
     }
     const data = req.body;
-    if (data?.skills.length > 5) {
+    if (data.skills && data?.skills.length > 5) {
       throw new Error("You can not add more than 5 skills!");
     }
     const loggedInUser = req.user;
     /*  console.log(loggedInUser); */
     // gives the data of user who's logged in and wanna do edit thier profile
     Object.keys(data).forEach((key) => (loggedInUser[key] = data[key]));
+    /* Object.assign(loggedInUser, data);  can also write like this*/
     /* console.log(loggedInUser); */
     // this now gives the values, keys, fields that are UPDATED by loggedin user and shows in console as we are console.logging!
     await loggedInUser.save();
     // save this updated/edited data into DB
-    res.send(`${loggedInUser.firstName}, your profile is updated successfully`);
+    res.json({
+      message: `${loggedInUser.firstName}, your profile is updated successfully`,
+      data: loggedInUser,
+    });
   } catch (err) {
     res
       .status(401)

@@ -3,13 +3,18 @@ const connectDatabase = require("./config/database");
 const User = require("./models/user");
 const app = express();
 const port = 4444;
-
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/users");
-
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -75,7 +80,7 @@ app.patch("/users/:userId", async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate({ _id: userId }, data, {
       runValidators: true,
     });
-    res.send("User is updated successfully!");
+    res.send("User data  is updated successfully!");
     console.log(updatedUser);
   } catch (err) {
     res.status(404).send("Something went wrong!" + err.message);
@@ -90,5 +95,5 @@ connectDatabase()
     });
   })
   .catch((err) => {
-    console.error("Database cannot be connected!");
+    console.error("Database cannot be connected " + err.message);
   });
