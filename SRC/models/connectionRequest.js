@@ -1,3 +1,4 @@
+// connection requests schema!!
 const mongoose = require("mongoose");
 
 const connectionRequestSchema = new mongoose.Schema(
@@ -11,6 +12,7 @@ const connectionRequestSchema = new mongoose.Schema(
     receiverUserId: {
       //toUserId
       type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     status: {

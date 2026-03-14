@@ -9,8 +9,7 @@ const jwt = require("jsonwebtoken");
 
 // signUp API
 authRouter.post("/signup", async (req, res) => {
-  const { firstName, lastName, emailId, password, phoneNumber, age, gender } =
-    req.body;
+  const { firstName, lastName, emailId, password, phoneNumber } = req.body;
   try {
     // validation of data
     validateSignUpData(req);
@@ -24,8 +23,6 @@ authRouter.post("/signup", async (req, res) => {
       emailId,
       password: encryptPassword,
       phoneNumber,
-      age,
-      gender,
     }); // post req- creating database
 
     // creating a new instance of user model
@@ -41,8 +38,20 @@ authRouter.post("/signup", async (req, res) => {
   app.use(express.json()); and req.body helps sending data dynamically!
   */
 
-    await user.save();
-    res.send("User Signed up successfully!");
+    const newSignedInUser = await user.save();
+    const token = jwt.sign({ _id: user._id }, "YekTerSec$44", {
+      expiresIn: "1d",
+    });
+
+    // Adding the token to cookie and send the (required) response back to the user
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 7 * 3600000),
+    });
+    res.json({
+      message: "Signed in successfully!",
+      success: true,
+      data: newSignedInUser,
+    });
   } catch (err) {
     res.status(400).send("Error signing up the user:" + err.message);
   }
@@ -68,10 +77,10 @@ authRouter.post("/login", async (req, res) => {
       });
       res.send(user);
     } else {
-      throw new Error("Invalid Credentials!");
+      throw new Error(" Invalid Credentials!");
     }
   } catch (error) {
-    res.status(400).send("ERROR:" + error.message);
+    res.status(400).send("ERROR: " + error.message);
   }
 });
 // logout API
