@@ -90,4 +90,29 @@ authRouter.post("/logout", async (req, res) => {
     .cookie("token", null, { expires: new Date(Date.now()) })
     .send("User Logged out Successfully!");
 });
+
+authRouter.post("/forgot-password", async (req, res) => {
+  const { emailId } = req.body;
+  const user = await User.findOne({ emailId });
+  if (!user) return res.status(404).send("User not found!");
+
+  const token = jwt.sign({ _id: user._id }, "YekTerSec$44", {
+    expiresIn: "15m",
+  });
+  const resetLink = `http://localhost:5173/reset-password/${token}`;
+  console.log("Reset Link: ", resetLink);
+  res.send("Resent Link Sent");
+});
+
+authRouter.post("/reset-password/:token", async (req, res) => {
+  const { password } = req.body;
+  const { token } = req.params;
+
+  const decoded = jwt.verify(token, "YekTerSec$44");
+  const user = await User.findById(decoded._id);
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.password = hashedPassword;
+  await user.save();
+  res.json({ messsage: "Password Reset successfull" });
+});
 module.exports = authRouter;
