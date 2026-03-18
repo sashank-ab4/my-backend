@@ -100,8 +100,8 @@ authRouter.post("/forgot-password", async (req, res) => {
     expiresIn: "15m",
   });
   const resetLink = `http://localhost:5173/reset-password/${token}`;
-  console.log("Reset Link: ", resetLink);
-  res.send("Resent Link Sent");
+
+  res.json({ message: "Reset Link Generated!", resetLink });
 });
 
 authRouter.post("/reset-password/:token", async (req, res) => {
@@ -113,6 +113,6 @@ authRouter.post("/reset-password/:token", async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
   user.password = hashedPassword;
   await user.save();
-  res.json({ messsage: "Password Reset successfull" });
+  res.json({ messsage: "Password Updated successfully" });
 });
 module.exports = authRouter;
