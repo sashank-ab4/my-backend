@@ -9,7 +9,7 @@ const userAuth = async (req, res, next) => {
     if (!token) {
       return res.status(401).send("You are logged out, please log in!");
     }
-    const decodedObject = jwt.verify(token, "YekTerSec$44");
+    const decodedObject = jwt.verify(token, process.env.JWT_KEY);
 
     const { _id } = decodedObject;
     const user = await User.findById(_id);

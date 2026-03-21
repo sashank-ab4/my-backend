@@ -4,6 +4,7 @@ const User = require("./models/user");
 const app = express();
 const port = 4444;
 const cors = require("cors");
+require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");

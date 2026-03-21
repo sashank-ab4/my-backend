@@ -39,7 +39,7 @@ authRouter.post("/signup", async (req, res) => {
   */
 
     const newSignedInUser = await user.save();
-    const token = jwt.sign({ _id: user._id }, "YekTerSec$44", {
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_KEY, {
       expiresIn: "1d",
     });
 
@@ -67,7 +67,7 @@ authRouter.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (isPasswordValid) {
       // Creating a JWT token for the user
-      const token = jwt.sign({ _id: user._id }, "YekTerSec$44", {
+      const token = jwt.sign({ _id: user._id }, process.env.JWT_KEY, {
         expiresIn: "1d",
       });
 
@@ -96,7 +96,7 @@ authRouter.post("/forgot-password", async (req, res) => {
   const user = await User.findOne({ emailId });
   if (!user) return res.status(404).send("User not found!");
 
-  const token = jwt.sign({ _id: user._id }, "YekTerSec$44", {
+  const token = jwt.sign({ _id: user._id }, process.env.JWT_KEY, {
     expiresIn: "15m",
   });
   const resetLink = `http://localhost:5173/reset-password/${token}`;
