@@ -1,6 +1,6 @@
 const express = require("express");
 const connectDatabase = require("./config/database");
-const User = require("./models/user");
+
 const app = express();
 const port = 4444;
 const cors = require("cors");
@@ -11,7 +11,8 @@ const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/users");
-const initializeSocket = require("./utils/socket");
+const textsRouter = require("./routes/texts.js");
+const initializeSocket = require("./utils/socket.js");
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -25,6 +26,7 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", textsRouter);
 
 const server = http.createServer(app);
 initializeSocket(server);
