@@ -40,9 +40,10 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
       data: loggedInUser,
     });
   } catch (err) {
-    res
-      .status(401)
-      .send("You cannot edit this particular field!" + err.message);
+    res.status(err.statusCode || 500).json({
+      success: false,
+      message: err.message,
+    });
   }
 });
 

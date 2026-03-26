@@ -59,8 +59,7 @@ const userSchema = new mongoose.Schema(
     },
     photoUrl: {
       type: String,
-      default:
-        "https://in.pinterest.com/pin/default-avatar-profile-user-profile-icon-profile-picture-portrait-symbol-user-member--674695587964911257/",
+      default: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
       validate(value) {
         if (!validator.isURL(value)) {
           throw new Error("Invalid Photo URL type:" + value);
