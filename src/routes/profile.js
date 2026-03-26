@@ -1,6 +1,8 @@
 const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const { validateProfileEditData } = require("../utils/validation");
+const { upload } = require("../middlewares/upload");
+const cloudinary = require("../utils/cloudinary");
 
 const profileRouter = express.Router();
 
@@ -44,6 +46,26 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
       success: false,
       message: err.message,
     });
+  }
+});
+
+profileRouter.post("/upload", upload.single("photo"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Photo not Uploaded!" });
+    }
+    const uploadResult = await cloudinary.uploader.upload_stream(
+      { folder: "devtribe" },
+      (error, uploadResult) => {
+        if (error) {
+          return res.status(500).json({ message: error.message });
+        }
+        res.json({ url: uploadResult.secure_url });
+      },
+    );
+    uploadResult.end(req.file.buffer);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
