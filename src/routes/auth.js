@@ -108,7 +108,7 @@ authRouter.post("/reset-password/:token", async (req, res) => {
   const { password } = req.body;
   const { token } = req.params;
 
-  const decoded = jwt.verify(token, JWT_KEY);
+  const decoded = jwt.verify(token, process.env.JWT_KEY);
   const user = await User.findById(decoded._id);
   const hashedPassword = await bcrypt.hash(password, 10);
   user.password = hashedPassword;
