@@ -15,7 +15,11 @@ const textsRouter = require("./routes/texts.js");
 const initializeSocket = require("./utils/socket.js");
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:4173",
+      "https://www.devtribe.online",
+    ],
     credentials: true,
   }),
 );
