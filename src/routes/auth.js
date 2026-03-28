@@ -100,7 +100,7 @@ authRouter.post("/forgot-password", async (req, res) => {
     expiresIn: "15m",
   });
   const resetLink = `${process.env.PROD_URL}/reset-password/${token}`;
-
+  console.log("reset link:", resetLink);
   res.json({ message: "Reset Link Generated!", resetLink });
 });
 

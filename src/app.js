@@ -38,6 +38,7 @@ initializeSocket(server);
 connectDatabase()
   .then(() => {
     console.log("DATABASE CONNECTION ESTABLISHED!");
+    console.log("prod_url:", process.env.PROD_URL);
     server.listen(port, () => {
       console.log("Server connected and listening to port:", port);
     });
