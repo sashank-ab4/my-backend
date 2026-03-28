@@ -99,7 +99,7 @@ authRouter.post("/forgot-password", async (req, res) => {
   const token = jwt.sign({ _id: user._id }, process.env.JWT_KEY, {
     expiresIn: "15m",
   });
-  const resetLink = `http://localhost:5173/reset-password/${token}`;
+  const resetLink = `${process.env.PROD_URL}/reset-password/${token}`;
 
   res.json({ message: "Reset Link Generated!", resetLink });
 });
