@@ -76,7 +76,7 @@ requestRouter.post(
       const loggedInUser = req.user;
       const { status, requestId } = req.params;
 
-      /* KEY CHECKS */
+      // KEY CHECKS
       // validate the status
       const allowedStatus = ["accepted", "rejected"];
       if (!allowedStatus.includes(status)) {
